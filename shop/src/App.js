@@ -1,5 +1,5 @@
 import "./App.css";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Container, Nav, Navbar } from "react-bootstrap";
 import products from "./data";
 import Shoe from "./Shoe";
@@ -16,11 +16,20 @@ import {
 } from "react-router-dom";
 
 function App() {
+  useEffect(() => {
+    if (localStorage.getItem("watched") === null)
+      localStorage.setItem("watched", JSON.stringify([]));
+  }, []);
+
   const [shoes, setShoes] = useState(products);
   const navigate = useNavigate();
   const [cart, setCart] = useState([]);
+
   const handleCart = (value) => {
     setCart([...cart, value]);
+  };
+  const handleRemove = (value) => {
+    setCart(value);
   };
 
   console.log(cart);
@@ -55,13 +64,13 @@ function App() {
           path="/"
           element={
             <>
-              <Shoe shoes={shoes} />
+              <Shoe shoes={shoes} setShoes={setShoes} />
             </>
           }
         ></Route>
         <Route
           path="/detail/:id"
-          element={<Detail shoes={shoes} handleCart={handleCart} />}
+          element={<Detail shoes={shoes} handleCart={handleCart} cart={cart} />}
         ></Route>
         <Route path="/event" element={<Event />}>
           <Route
@@ -70,7 +79,10 @@ function App() {
           ></Route>
           <Route path="two" element={<div>생일기념 쿠폰받기</div>}></Route>
         </Route>
-        <Route path="/cart" element={<Cart cart={cart} />}></Route>
+        <Route
+          path="/cart"
+          element={<Cart cart={cart} handleRemove={handleRemove} />}
+        ></Route>
       </Routes>
     </div>
   );
